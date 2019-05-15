@@ -43,6 +43,8 @@ Por questão de segurança, o bot utiliza da biblioteca **OS** do Python para im
 
 `export PASS_USER_DATABASE="(SENHA DO SEU BANCO DE DADOS)"`
 
+`export HOST="(SEU IP)"`
+
 
 
 ## TOKEN DO BOT PARA TELEGRAM

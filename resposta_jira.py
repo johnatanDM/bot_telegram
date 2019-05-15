@@ -5,6 +5,7 @@ from aiohttp import web
 from banco_de_dados import resposta_jira_dump 
 
 token = os.getenv("BOT_API_TOKEN")
+host = os.getenv("HOST")
 URL = "https://api.telegram.org/bot{}/".format(token)
 
 
@@ -19,7 +20,7 @@ async def resposta_dump(request):
 
 app = web.Application()
 app.add_routes([web.post('/resposta_dump', resposta_dump)])
-web.run_app(app,host='172.30.91.9', port=3030)
+web.run_app(app,host=host, port=3030)
 
 
 

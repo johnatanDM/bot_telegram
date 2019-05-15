@@ -20,7 +20,7 @@ def jira(porta):
     jira = Jira(
         url=jiraurl + ':' + porta,
         username='sistema',
-        password= os.environ["JIRA_SENHA_" + porta])
+        password= os.getenv("JIRA_SENHA_" + porta))
     return jira
 bot = telebot.TeleBot(token)
 
