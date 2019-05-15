@@ -4,7 +4,7 @@ import requests
 from aiohttp import web
 from banco_de_dados import resposta_jira_dump 
 
-token = os.environ['BOT_API_TOKEN']
+token = os.environ["BOT_API_TOKEN"]
 URL = "https://api.telegram.org/bot{}/".format(token)
 
 
