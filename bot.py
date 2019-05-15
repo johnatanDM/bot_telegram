@@ -8,13 +8,13 @@ from conecta import Conexao
 from aiohttp import web 
 from atlassian import Jira
 
-token = os.environ["BOT_API_TOKEN"]
+token = os.getenv("BOT_API_TOKEN")
 URL = "https://api.telegram.org/bot{}/".format(token)
-jiraurl = os.environ["JIRA_URL"]
-host_database = os.environ["HOST_DATABASE"]
-database = os.environ["DATABASE"]
-user_database = os.environ["USER_DATABASE"]
-pass_user_database = os.environ["PASS_USER_DATABASE"]
+jiraurl = os.getenv("JIRA_URL")
+host_database = os.getenv("HOST_DATABASE")
+database = os.getenv("DATABASE")
+user_database = os.getenv("USER_DATABASE")
+pass_user_database = os.getenv("PASS_USER_DATABASE")
 
 def jira(porta):
     jira = Jira(
