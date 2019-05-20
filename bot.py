@@ -57,8 +57,8 @@ def mecadastra(message):
 
 @bot.callback_query_handler(func=lambda m: True)
 def autorize(message):
-    autorize = re.match(r'Sim autorize.', message.data)
-    chat_id = re.search(r'\d{9,9}$', message.data).group(0)
+    autorize = re.match(r'Sim autorize.', message.data) 
+    chat_id = message.from_user.id
     if autorize:
         con=conectar()
         sql = ("update users set aprovado = true where id = %s" % chat_id)
