@@ -77,6 +77,8 @@ def send_welcome(message):
     bot.reply_to(message, """Olá, Eu sou o Cotequinho Bot e já sei fazer algumas coisas! \n
 - Você pode pedir Dump para a equipe de Banco de dados assim: \n
 /dump Sistema Ambiente_origem -> Ambiente_destino \n
+- Você pode pedir para o DBA lhe ajudar em uma consulta assim: \n
+/sqlhelp Sistema \n
 - Você também pode pedir para cadastrar um novo relógio no banco do ponto assim: \n
 /novo_relogio ip: 172.123.123.123 orgao: GMF descricao: GONZAGUINHA MESSEJANA   
 """)
