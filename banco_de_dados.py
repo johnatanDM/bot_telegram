@@ -21,6 +21,24 @@ def issue_jira_dump(jira, bot, message):
     else:
         bot.reply_to(message, "Por favor me informe o seu dump como no exemplo: \n \"/dump Sistema Ambiente_origem -> Ambiente_destino\"")
 
+def issue_jira_sqlhelp(jira, bot, message):
+    titulo = message.text[9:]
+    usuario = message.from_user.first_name + ' ' + (message.from_user.last_name or '')
+    fields = {
+        'project': {
+            'key': "ADDBDD"
+        },
+        'summary': 'SQLHelp: %s' % titulo,
+        'description': '%s' % usuario,
+        'issuetype': {
+            'name': "Task"
+        }
+    }
+    jira.issue_create(fields)
+    bot.reply_to(message,"O DBA já foi avisado e assim que possível irá lhe atender.")
+    bot.send_message(887248892, ("SQLHelp: %s, %s" % (titulo, usuario))) #johnatan
+    bot.send_message(103309575, ("SQLHelp: %s, %s" % (titulo, usuario))) #adolfho
+
 def issue_jira_novo_relogio(jira, bot, message):
     match = re.match(r'.+(?:\d{1,3}\.){3}\d{1,3}.+', message.text)
     if match:

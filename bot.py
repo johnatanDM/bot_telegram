@@ -97,5 +97,12 @@ def novo_relogio(message):
     else:
         bot.reply_to(message, "Você não está autorizado a usar esse bot")
 
+@bot.message_handler(commands=['sqlhelp'])
+def sql_help(message):
+    if autorizado(message):
+        banco_de_dados.issue_jira_sqlhelp(jira('9090'), bot, message)
+    else:
+        bot.reply_to(message, "Você não está autorizado a usar esse bot")
+
 bot.polling()   
 
