@@ -45,8 +45,8 @@ def mecadastra(message):
     if con.manipular(sql):
         bot.reply_to(message, "inserido com sucesso!!")
         teclado = types.InlineKeyboardMarkup(row_width=1)
-        sim = types.InlineKeyboardButton(text=("Sim autorize"), callback_data=("Sim autorize %s, %s" % (message.from_user.username, message.from_user.id)))
-        nao = types.InlineKeyboardButton(text=("Não autorize"), callback_data=("Não autorize %s, %s" % (message.from_user.username, message.from_user.id)))
+        sim = types.InlineKeyboardButton(text=("Sim autorize"), callback_data="Sim autorize")
+        nao = types.InlineKeyboardButton(text=("Não autorize"), callback_data="Não autorize")
         teclado.add(sim, nao)
         bot.send_message(887248892, ("Autorizar %s %s, %s para usar o Cotequinho_bot?" % (message.from_user.first_name,message.from_user.last_name , message.from_user.id)), reply_markup=teclado)
 
@@ -55,9 +55,9 @@ def mecadastra(message):
         bot.reply_to(message, "Não deu! :( ")
     con.fechar()
 
-@bot.callback_query_handler(func=lambda m: True)
+@bot.callback_query_handler(func=lambda query: query.data == "Sim autorize")
 def autorize(message):
-    autorize = re.match(r'Sim autorize.', message.data) 
+    autorize = re.match(r'Sim autorize', message.data) 
     chat_id = message.from_user.id
     if autorize:
         con=conectar()
@@ -87,9 +87,26 @@ def send_welcome(message):
 @bot.message_handler(commands=['dump'])
 def dump(message):
     if autorizado(message):
-        banco_de_dados.issue_jira_dump(jira('9090'), bot, message)
+        titulo = message.text[6:]
+        atividade = banco_de_dados.issue_jira_dump(jira('9090'), bot, message)
+        teclado = types.InlineKeyboardMarkup(row_width=1)
+        btn_feito = types.InlineKeyboardButton(text=("Dump terminado! %s " % atividade['key']), callback_data="Dump terminado!")
+        teclado.add(btn_feito)
+        bot.send_message(887248892, ("Fazer dump: %s" % titulo), reply_markup=teclado)
     else:
         bot.reply_to(message, "Você não está autorizado a usar esse bot")
+
+@bot.callback_query_handler(func=lambda query: query.data == "Dump terminado!")
+def terminado(message):
+    texto = message.message.json["reply_markup"]["inline_keyboard"][0][0]["text"]
+    atividade = re.findall(r'ADDBDD-\d+', texto)[0]
+    print(atividade)
+    if atividade:
+        jira('9090').issue_transition(atividade, 'in progress')
+        jira('9090').issue_transition(atividade, 'done')
+    else:
+        print("nope")
+    
 
 
 @bot.message_handler(commands=['novo_relogio'])

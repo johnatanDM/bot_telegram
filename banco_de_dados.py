@@ -1,5 +1,6 @@
 import re
 
+
 def issue_jira_dump(jira, bot, message):
     match = re.match(r'.+ +.+->.+', message.text)
     if match:
@@ -15,11 +16,14 @@ def issue_jira_dump(jira, bot, message):
                 'name': "Task"
             }
         }
-        jira.issue_create(fields)
+        atividade = jira.issue_create(fields)
         bot.reply_to(message,"Seu Dump foi registrado no nosso JIRA")
-        bot.send_message(887248892, ("Fazer dump: %s" % titulo))
+        return atividade
+        
     else:
         bot.reply_to(message, "Por favor me informe o seu dump como no exemplo: \n \"/dump Sistema Ambiente_origem -> Ambiente_destino\"")
+
+    
 
 def issue_jira_sqlhelp(jira, bot, message):
     titulo = message.text[9:]
