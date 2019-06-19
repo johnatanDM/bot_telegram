@@ -89,10 +89,11 @@ def dump(message):
     if autorizado(message):
         titulo = message.text[6:]
         atividade = banco_de_dados.issue_jira_dump(jira('9090'), bot, message)
-        teclado = types.InlineKeyboardMarkup(row_width=1)
-        btn_feito = types.InlineKeyboardButton(text=("Dump terminado! %s " % atividade['key']), callback_data="Dump terminado!")
-        teclado.add(btn_feito)
-        bot.send_message(887248892, ("Fazer dump: %s" % titulo), reply_markup=teclado)
+        if atividade:
+            teclado = types.InlineKeyboardMarkup(row_width=1)
+            btn_feito = types.InlineKeyboardButton(text=("Dump terminado! %s " % atividade['key']), callback_data="Dump terminado!")
+            teclado.add(btn_feito)
+            bot.send_message(887248892, ("Fazer dump: %s" % titulo), reply_markup=teclado)
     else:
         bot.reply_to(message, "Você não está autorizado a usar esse bot")
 
@@ -102,11 +103,16 @@ def terminado(message):
     atividade = re.findall(r'ADDBDD-\d+', texto)[0]
     print(atividade)
     if atividade:
-        jira('9090').issue_transition(atividade, 'in progress')
-        jira('9090').issue_transition(atividade, 'done')
+        progress = jira('9090').issue_transition(atividade, 'in progress')
+        done = jira('9090').issue_transition(atividade, 'done')
+        if progress and done :
+            bot.send_message(887248892, "Atividade %s encerrada!!" % atividade)
+        else:
+            bot.send_message(887248892, "Não foi possível encerrar atividade %s " % atividade)
+
     else:
         print("nope")
-    
+        bot.send_message(887248892, "Não foi encontrado atividade")
 
 
 @bot.message_handler(commands=['novo_relogio'])
