@@ -77,10 +77,14 @@ def send_welcome(message):
     bot.reply_to(message, """Olá, Eu sou o Cotequinho Bot e já sei fazer algumas coisas! \n
 - Você pode pedir Dump para a equipe de Banco de dados assim: \n
 /dump Sistema Ambiente_origem -> Ambiente_destino \n
-- Você pode pedir para o DBA lhe ajudar em uma consulta assim: \n
+- Você pode pedir para o DBA lhe ajudar a criar uma consulta assim: \n
 /sqlhelp Sistema \n
+- Quer uma ajuda pra melhorar uma consulta que já existe? \n
+/slqtune Sistema \n
+- Para solicitar recovery, integração ou acesso a algum banco: \n
+/manutencaobd Descrição \n
 - Você também pode pedir para cadastrar um novo relógio no banco do ponto assim: \n
-/novo_relogio ip: 172.123.123.123 orgao: GMF descricao: GONZAGUINHA MESSEJANA   
+/novorelogio ip: 172.123.123.123 orgao: GMF descricao: GONZAGUINHA MESSEJANA   
 """)
 
 
@@ -91,7 +95,7 @@ def dump(message):
         atividade = banco_de_dados.issue_jira_dump(jira('9090'), bot, message)
         if atividade:
             teclado = types.InlineKeyboardMarkup(row_width=1)
-            btn_feito = types.InlineKeyboardButton(text=("Dump terminado! %s " % atividade['key']), callback_data="Dump terminado!")
+            btn_feito = types.InlineKeyboardButton(text=("Encerrar atividade %s " % atividade['key']), callback_data="Dump terminado!")
             teclado.add(btn_feito)
             bot.send_message(887248892, ("Fazer dump: %s" % titulo), reply_markup=teclado)
     else:
@@ -101,21 +105,30 @@ def dump(message):
 def terminado(message):
     texto = message.message.json["reply_markup"]["inline_keyboard"][0][0]["text"]
     atividade = re.findall(r'ADDBDD-\d+', texto)[0]
-    print(atividade)
     if atividade:
-        progress = jira('9090').issue_transition(atividade, 'in progress')
-        done = jira('9090').issue_transition(atividade, 'done')
-        if progress and done :
-            bot.send_message(887248892, "Atividade %s encerrada!!" % atividade)
+        verifica = (jira('9090').issue_exists(atividade) and not jira('9090').issue_deleted(atividade))
+        print('teste: ')
+        print(jira('9090').issue_deleted(atividade))
+        print(verifica)
+        if verifica:
+            status = jira('9090').get_issue_status(atividade)
+            if status == 'Backlog':
+                jira('9090').issue_transition(atividade, 'in progress')
+            status = jira('9090').get_issue_status(atividade)
+            if status == 'In Progress':
+                jira('9090').issue_transition(atividade, 'done')
+            status = jira('9090').get_issue_status(atividade)
+            if status == 'Done' :
+                bot.send_message(887248892, "Atividade %s encerrada!!" % atividade)
+            else:
+                bot.send_message(887248892, "Não foi possível encerrar atividade %s " % atividade)
         else:
-            bot.send_message(887248892, "Não foi possível encerrar atividade %s " % atividade)
-
+            bot.send_message(887248892, "Não foi encontrado atividade")
     else:
-        print("nope")
-        bot.send_message(887248892, "Não foi encontrado atividade")
+        bot.send_message(887248892, "Key da atividade não encontrado no texto da mensagem")
 
 
-@bot.message_handler(commands=['novo_relogio'])
+@bot.message_handler(commands=['novorelogio'])
 def novo_relogio(message):
     if autorizado(message):
         banco_de_dados.issue_jira_novo_relogio(jira('9090'), bot, message)
@@ -133,6 +146,13 @@ def sql_help(message):
 def sql_tune(message):
     if autorizado(message):
         banco_de_dados.issue_jira_sqltune(jira('9090'), bot, message)
+    else:
+        bot.reply_to(message, "Você não está autorizado a usar esse bot")
+
+@bot.message_handler(commands=['manutencaobd'])
+def manutencaoBD(message):
+    if autorizado(message):
+        banco_de_dados.issue_jira_manutencaobd(jira('9090'), bot, message)
     else:
         bot.reply_to(message, "Você não está autorizado a usar esse bot")
 

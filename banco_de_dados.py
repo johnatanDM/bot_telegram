@@ -11,7 +11,7 @@ def issue_jira_dump(jira, bot, message):
                 'key': "ADDBDD"
             },
             'summary': 'Dump: %s' % titulo,
-            'description': '%s' % usuario,
+            'customfield_10500': '%s' % usuario,
             'issuetype': {
                 'name': "Task"
             }
@@ -61,6 +61,25 @@ def issue_jira_sqltune(jira, bot, message):
     bot.send_message(887248892, ("SQLTune: %s, %s" % (titulo, usuario))) #johnatan
     bot.send_message(103309575, ("SQLTune: %s, %s" % (titulo, usuario))) #adolfho
 
+def issue_jira_manutencaobd(jira, bot, message):
+    titulo = message.text[14:]
+    usuario = message.from_user.first_name + ' ' + (message.from_user.last_name or '')
+    fields = {
+        'project': {
+            'key': "ADDBDD"
+        },
+        'summary': 'ManutençãoBD: %s' % usuario,
+        'customfield_10500': '%s' % usuario,
+        'description': '%s' % titulo,
+        'issuetype': {
+            'name': "Task"
+        }
+    }
+    jira.issue_create(fields)
+    bot.reply_to(message,"O DBA já foi avisado e assim que possível irá lhe atender.")
+    bot.send_message(887248892, ("ManutençãoBD: %s, %s" % (titulo, usuario))) #johnatan
+    # bot.send_message(103309575, ("ManutençãoBD: %s, %s" % (titulo, usuario))) #adolfho
+
 def issue_jira_novo_relogio(jira, bot, message):
     match = re.match(r'.+(?:\d{1,3}\.){3}\d{1,3}.+', message.text)
     if match:
@@ -82,6 +101,6 @@ def issue_jira_novo_relogio(jira, bot, message):
         bot.reply_to(message, "IP inválido")
 
 def resposta_jira_dump(resposta_jira):
-    usuario = resposta_jira["issue"]["fields"]["description"]
+    usuario = resposta_jira["issue"]["fields"]["customfield_10500"]
     mensagem = "O %s terminou" % resposta_jira["issue"]["fields"]["summary"]
     return mensagem, usuario
